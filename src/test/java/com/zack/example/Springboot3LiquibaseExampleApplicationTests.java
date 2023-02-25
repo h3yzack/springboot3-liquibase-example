@@ -1,4 +1,4 @@
-package com.zack.springboot3liquibaseexample;
+package com.zack.example;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
