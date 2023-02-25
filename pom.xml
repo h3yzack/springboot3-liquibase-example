@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.0.3</version>
+		<relativePath/>
+		<!-- lookup parent from repository -->
+	</parent>
+
+	<groupId>com.zack</groupId>
+	<artifactId>springboot3-liquibase-example</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>springboot3-liquibase-example</name>
+	<description>Example project for Spring Boot with liquibase</description>
+
+	<properties>
+		<java.version>19</java.version>
+		<spring-boot.ver>3.0.2</spring-boot.ver>
+		<liquibase-maven-plugin.version>4.19.0</liquibase-maven-plugin.version>
+		<liquibase-hibernate.version>4.19.0</liquibase-hibernate.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>${liquibase-maven-plugin.version}</version>
+				<configuration>
+					<changeLogFile>src/main/resources/db/changelog/master.xml</changeLogFile>
+					<outputChangeLogFile>src/main/resources/db/changelog/migration/1.0_init.postgresql.sql</outputChangeLogFile>
+					<diffChangeLogFile>src/main/resources/db/changelog/migration/_${diff.version}_migrate.sql</diffChangeLogFile>
+					<propertyFile>src/main/resources/liquibase.properties</propertyFile>
+				</configuration>
+
+				<dependencies>
+					<dependency>
+						<groupId>org.liquibase.ext</groupId>
+						<artifactId>liquibase-hibernate6</artifactId>
+						<version>${liquibase-hibernate.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.springframework.data</groupId>
+						<artifactId>spring-data-jpa</artifactId>
+						<version>3.0.2</version>
+					</dependency>
+					<dependency>
+						<groupId>io.hypersistence</groupId>
+						<artifactId>hypersistence-utils-hibernate-60</artifactId>
+						<version>3.2.0</version>
+					</dependency>
+					<dependency>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>jackson-databind</artifactId>
+						<version>2.14.2</version>
+					</dependency>
+
+				</dependencies>
+
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
