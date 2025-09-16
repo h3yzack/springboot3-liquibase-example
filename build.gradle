@@ -1,0 +1,107 @@
+buildscript {
+    dependencies {
+        classpath "org.liquibase:liquibase-core:4.31.1"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.liquibase.gradle' version '3.0.2'
+}
+
+group = 'com.zack'
+version = '0.0.1-SNAPSHOT'
+description = 'Example project for Spring Boot with liquibase'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    liquibaseVersion = '4.31.1'         
+    liquibaseHibernateVersion = '4.31.1' 
+    postgresVersion = '42.7.7'           
+
+    // Liquibase settings
+    diffVersion = project.hasProperty('diff.version') ? project.property('diff.version') : '0.1.0'
+    diffChangelogFile = "src/main/resources/db/changelog/migration/_${diffVersion}_migrate.sql"
+    changesetAuthor = project.hasProperty('author') ? project.property('author') : 'Zack'
+}
+
+
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation "org.liquibase:liquibase-core"
+    runtimeOnly "org.postgresql:postgresql"
+
+    // --- Dependencies required by the Liquibase Gradle plugin 
+    liquibaseRuntime "org.liquibase:liquibase-core:${liquibaseVersion}"
+    liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibaseHibernateVersion}"
+    liquibaseRuntime "org.postgresql:postgresql:${postgresVersion}"
+    liquibaseRuntime 'info.picocli:picocli:4.7.5'
+    liquibaseRuntime "org.apache.commons:commons-lang3:3.14.0"
+    liquibaseRuntime sourceSets.main.output
+    
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+configurations {
+    liquibaseRuntime.extendsFrom runtimeClasspath
+}
+
+tasks.withType(org.liquibase.gradle.LiquibaseTask).configureEach {
+    dependsOn 'classes'
+}
+
+// Liquibase plugin configuration
+liquibase {
+    activities {
+        main {
+            changelogFile diffChangelogFile
+            propertyFile 'src/main/resources/liquibase.properties'
+            author "${changesetAuthor}"
+
+            // url 'jdbc:postgresql://127.0.0.1:5432/example-sbl'
+            // username 'postgres'
+            // password 'postgres'
+            // driver 'org.postgresql.Driver'
+            // referenceUrl 'hibernate:spring:com.zack.example.entity?dialect=org.hibernate.dialect.PostgreSQLDialect'
+            // defaultSchemaName 'public'
+
+        }
+       
+    }
+    runList = 'main'
+}
+
+task('dbChangeLog') {
+  doFirst(){
+    liquibase {
+      activities {
+        main {
+          changelogFile "src/main/resources/db/changelog/db.changelog-master.yaml"
+        }
+      }
+    }
+  }
+}
+
+update.dependsOn('dbChangeLog')
